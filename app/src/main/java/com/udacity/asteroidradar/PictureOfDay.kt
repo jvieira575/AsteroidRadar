@@ -2,5 +2,7 @@ package com.udacity.asteroidradar
 
 import com.squareup.moshi.Json
 
-data class PictureOfDay(@Json(name = "media_type") val mediaType: String, val title: String,
-                        val url: String)
+/**
+ * Data class to hold the NASA Picture of the Day.
+ */
+data class PictureOfDay(@Json(name = "media_type") val mediaType: String, val title: String, val url: String)

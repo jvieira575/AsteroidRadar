@@ -7,6 +7,10 @@ import androidx.lifecycle.ViewModelProvider
 import com.udacity.asteroidradar.R
 import com.udacity.asteroidradar.databinding.FragmentMainBinding
 
+/**
+ * [Fragment] used to display the NASA Picture of the Day and a [List] of Near Earth Objects. Serves
+ * as the first view a user sees when launching the app.
+ */
 class MainFragment : Fragment() {
 
     private val viewModel: MainViewModel by lazy {
