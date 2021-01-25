@@ -12,10 +12,10 @@ This kind of app is one of the most usual in the real world, what you will learn
 
 ### Screenshots
 
-![Screenshot 1](starter/screenshots/screen_1.png)
-![Screenshot 2](starter/screenshots/screen_2.png)
-![Screenshot 3](starter/screenshots/screen_3.png)
-![Screenshot 4](starter/screenshots/screen_4.png)
+![Screenshot 1](/screenshots/screen_1.png)
+![Screenshot 2](/screenshots/screen_2.png)
+![Screenshot 3](/screenshots/screen_3.png)
+![Screenshot 4](/screenshots/screen_4.png)
 
 ### Dependencies
 
@@ -66,7 +66,7 @@ To get the project running on your local machine, you need to follow these steps
 
 Use this to clone it to your local machine:
 ```bash
-git clone https://github.com/udacity/REPOSITORY_NAME.git
+git clone https://github.com/jvieira575/AsteroidRadar.git
 ```
 
 **Step 2: Check out the ‘master’ branch**
@@ -127,6 +127,8 @@ To build this project you are going to use the NASA NeoWS (Near Earth Object Web
 https://api.nasa.gov/
 
 You will need an API Key which is provided for you in that same link, just fill the fields in the form and click Signup.
+
+Once you have your API Key, add it to your local.properties file. The key name for this property is located in the app's build.gradle file under buildTypes.
 
 ## License
 
