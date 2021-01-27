@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.udacity.asteroidradar.domain.PictureOfDay
 import com.udacity.asteroidradar.repository.NasaRepository
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 /**
  * [ViewModel] designed to store and manage UI-related data in a lifecycle conscious way. Used in
@@ -43,9 +44,7 @@ class MainViewModel : ViewModel() {
                 }
 
             } catch (e: Exception) {
-
-                // TODO: Configure Timber instead
-                Log.e(MainViewModel::class.simpleName, "Could not retrieve the NASA APOD...", e)
+                Timber.e(e, "Could not retrieve the NASA APOD...")
             }
         }
     }
