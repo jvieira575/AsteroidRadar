@@ -59,6 +59,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/default_margin"
             android:layout_marginEnd="@dimen/default_margin"
+            android:contentDescription="@string/this_is_the_asteroid_hazard_icon_showing_nothing_yet"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/guideline"

@@ -20,6 +20,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
+            android:contentDescription="@string/this_is_the_asteroid_hazard_image_showing_nothing_yet"
+            app:asteroidDetailImageContentDescription="@{asteroid.potentiallyHazardous}"
             app:asteroidStatusImage="@{asteroid.potentiallyHazardous}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -93,6 +95,7 @@
                         android:id="@+id/help_button"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:contentDescription="@string/astronomical_unit_explanation_button"
                         android:padding="16dp"
                         app:srcCompat="@drawable/ic_help_circle" />
 
@@ -147,7 +150,9 @@
                     tools:text="0.0924 au" />
 
             </LinearLayout>
+
         </ScrollView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 </layout>

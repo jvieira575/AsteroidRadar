@@ -39,3 +39,12 @@ fun bindTextViewToDisplayVelocity(textView: TextView, number: Double) {
     val context = textView.context
     textView.text = String.format(context.getString(R.string.km_s_unit_format), number)
 }
+
+@BindingAdapter("asteroidDetailImageContentDescription")
+fun bindAsteroidDetailImageContentDescription(imageView: ImageView, isHazardous: Boolean){
+    if (isHazardous) {
+        imageView.contentDescription = imageView.context.getString(R.string.potentially_hazardous_asteroid_image)
+    } else {
+        imageView.contentDescription = imageView.context.getString(R.string.not_hazardous_asteroid_image)
+    }
+}
