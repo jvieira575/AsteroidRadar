@@ -4,16 +4,24 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.udacity.asteroidradar.BuildConfig
+import com.udacity.asteroidradar.api.getDefaultEndDateFormatted
+import com.udacity.asteroidradar.api.getDefaultStartDateFormatted
+import com.udacity.asteroidradar.api.parseAsteroidsJsonResult
 import com.udacity.asteroidradar.domain.Asteroid
 import com.udacity.asteroidradar.domain.PictureOfDay
+import com.udacity.asteroidradar.network.NasaApi
 import com.udacity.asteroidradar.repository.NasaRepository
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 import timber.log.Timber
 
 /**
  * [ViewModel] designed to store and manage UI-related data in a lifecycle conscious way. Used in
  * [com.udacity.asteroidradar.MainActivity].
  */
+enum class AsteroidApiStatus { LOADING, ERROR, DONE }
+
 class MainViewModel : ViewModel() {
 
     // The NASA repository
@@ -33,6 +41,12 @@ class MainViewModel : ViewModel() {
     private val _navigateToSelectedAsteroid = MutableLiveData<Asteroid>()
     val navigateToSelectedAsteroid: LiveData<Asteroid>
         get() = _navigateToSelectedAsteroid
+
+
+    // The internal MutableLiveData that stores the status of the most recent asteroid request
+    private val _status = MutableLiveData<AsteroidApiStatus>()
+    val status: LiveData<AsteroidApiStatus>
+        get() = _status
 
     init {
 
@@ -67,17 +81,34 @@ class MainViewModel : ViewModel() {
         viewModelScope.launch {
             try {
 
-                // Create test asteroids
-                val asteroidOne = Asteroid(1, "89355 (2001 VS78)", "2021-01-28", 5.00, 10.00, 15.00, 20.00, false )
-                val asteroidTwo = Asteroid(1, "337084 (1998 SE36)", "2021-01-28", 25.00, 30.00, 35.00, 40.00, true )
-                val testAsteroids = ArrayList<Asteroid>()
-                testAsteroids.add(asteroidOne)
-                testAsteroids.add(asteroidTwo)
+                _status.value = AsteroidApiStatus.LOADING
 
-                _asteroids.value = testAsteroids
-                Timber.e("Asteroids: %s", asteroids.value?.size)
+                val result = NasaApi.nasaApiService.getAsteroids(
+                    BuildConfig.API_KEY,
+                    getDefaultStartDateFormatted(),
+                    getDefaultEndDateFormatted()
+                )
+                val asteroids = parseAsteroidsJsonResult(JSONObject(result))
+                val domainAsteroids = asteroids.map {
+                    Asteroid(
+                        id = it.id,
+                        codename = it.codename,
+                        closeApproachDate = it.closeApproachDate,
+                        absoluteMagnitude = it.absoluteMagnitude,
+                        estimatedDiameter = it.estimatedDiameter,
+                        relativeVelocity = it.relativeVelocity,
+                        distanceFromEarth = it.distanceFromEarth,
+                        isPotentiallyHazardous = it.isPotentiallyHazardous
+                    )
+                }
+                _asteroids.value = domainAsteroids
+                _status.value = AsteroidApiStatus.ERROR
+                Timber.e("Asteroids: %s", asteroids.size)
+
             } catch (e: Exception) {
                 Timber.e(e, "Could not retrieve the NASA NEO...")
+                _status.value = AsteroidApiStatus.ERROR
+                _asteroids.value = ArrayList()
             }
         }
     }
