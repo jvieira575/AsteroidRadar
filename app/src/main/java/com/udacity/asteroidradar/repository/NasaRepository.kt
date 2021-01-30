@@ -2,6 +2,7 @@ package com.udacity.asteroidradar.repository
 
 import com.udacity.asteroidradar.BuildConfig
 import com.udacity.asteroidradar.api.parseAsteroidsJsonResult
+import com.udacity.asteroidradar.database.AsteroidsDatabase
 import com.udacity.asteroidradar.domain.Asteroid
 import com.udacity.asteroidradar.domain.PictureOfDay
 import com.udacity.asteroidradar.network.NasaApi
@@ -11,7 +12,7 @@ import org.json.JSONObject
 /**
  * The repository class containing operations for use with NASA APIs.
  */
-class NasaRepository {
+class NasaRepository(private val asteroidsDatabase: AsteroidsDatabase) {
 
     /**
      * Retrieves the NASA APOD (Astronomy Picture of the Day).
@@ -30,13 +31,18 @@ class NasaRepository {
      */
     suspend fun refreshAsteroids(startDate: String, endDate: String): List<Asteroid> {
 
-        val result = NasaApi.nasaApiService.getAsteroids(
+        // Retrieve network asteroids JSON response
+        val networkAsteroids = NasaApi.nasaApiService.getAsteroids(
             BuildConfig.API_KEY,
             startDate,
             endDate
         )
 
-        val asteroids = parseAsteroidsJsonResult(JSONObject(result))
-        return asteroids.asDomainModel()
+        // Parse JSON into our NetworkAsteroidList
+        val networkAsteroidList = parseAsteroidsJsonResult(JSONObject(networkAsteroids))
+
+        // Transform them into our domain model
+        val asteroids = networkAsteroidList.asDomainModel()
+        return asteroids
     }
 }

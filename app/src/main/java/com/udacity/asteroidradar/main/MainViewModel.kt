@@ -1,10 +1,9 @@
 package com.udacity.asteroidradar.main
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import android.app.Application
+import androidx.lifecycle.*
 import com.udacity.asteroidradar.api.getDefaultStartDateFormatted
+import com.udacity.asteroidradar.database.getDatabase
 import com.udacity.asteroidradar.domain.Asteroid
 import com.udacity.asteroidradar.domain.PictureOfDay
 import com.udacity.asteroidradar.repository.NasaRepository
@@ -17,10 +16,11 @@ import timber.log.Timber
  */
 enum class AsteroidApiStatus { LOADING, ERROR, DONE }
 
-class MainViewModel : ViewModel() {
+class MainViewModel(application: Application) : AndroidViewModel(application) {
 
-    // The NASA repository
-    private val nasaRepository = NasaRepository()
+    // The asteroid database and NASA repository
+    private val asteroidsDatabase = getDatabase(application)
+    private val nasaRepository = NasaRepository(asteroidsDatabase)
 
     // Live Data to hold the NASA APOD
     private val _pictureOfDay = MutableLiveData<PictureOfDay>()
@@ -95,5 +95,18 @@ class MainViewModel : ViewModel() {
 
     fun navigateToSelectedAsteroidCompleted() {
         _navigateToSelectedAsteroid.value = null
+    }
+
+    /**
+     * Factory for constructing MainViewModel instances.
+     */
+    class Factory(val app: Application) : ViewModelProvider.Factory {
+        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
+                @Suppress("UNCHECKED_CAST")
+                return MainViewModel(app) as T
+            }
+            throw IllegalArgumentException("Unable to construct MainViewModel")
+        }
     }
 }
