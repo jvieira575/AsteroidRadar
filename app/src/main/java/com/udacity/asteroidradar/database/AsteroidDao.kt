@@ -11,10 +11,10 @@ import com.udacity.asteroidradar.database.domain.DatabaseAsteroid
 @Dao
 interface AsteroidDao {
 
-    @Query("SELECT * FROM DatabaseAsteroid WHERE closeApproachDate BETWEEN :startDate AND :endDate ORDER BY closeApproachDate DESC")
+    @Query("SELECT * FROM DatabaseAsteroid WHERE closeApproachDate BETWEEN :startDate AND :endDate ORDER BY closeApproachDate ASC")
     fun getAsteroidsByDate(startDate: String, endDate: String): LiveData<List<DatabaseAsteroid>>
 
-    @Query("SELECT * FROM DatabaseAsteroid ORDER BY closeApproachDate DESC")
+    @Query("SELECT * FROM DatabaseAsteroid ORDER BY closeApproachDate ASC")
     fun getAllAsteroids(): LiveData<List<DatabaseAsteroid>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

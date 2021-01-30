@@ -1,17 +1,14 @@
 package com.udacity.asteroidradar.network.domain
 
 import com.squareup.moshi.JsonClass
-import com.udacity.asteroidradar.domain.Asteroid
+import com.udacity.asteroidradar.database.domain.DatabaseAsteroid
 
 @JsonClass(generateAdapter = true)
 data class NetworkAsteroidList(val networkAsteroids: List<NetworkAsteroid>)
 
-/**
- * Convert network asteroids to domain objects.
- */
-fun NetworkAsteroidList.asDomainModel(): List<Asteroid> {
+fun NetworkAsteroidList.asDatabaseModel(): Array<DatabaseAsteroid> {
     return networkAsteroids.map {
-        Asteroid(
+        DatabaseAsteroid(
             id = it.id,
             codename = it.codename,
             closeApproachDate = it.closeApproachDate,
@@ -21,5 +18,5 @@ fun NetworkAsteroidList.asDomainModel(): List<Asteroid> {
             distanceFromEarth = it.distanceFromEarth,
             isPotentiallyHazardous = it.isPotentiallyHazardous
         )
-    }
+    }.toTypedArray()
 }

@@ -2,6 +2,7 @@ package com.udacity.asteroidradar.main
 
 import android.app.Application
 import androidx.lifecycle.*
+import com.udacity.asteroidradar.api.getDefaultEndDateFormatted
 import com.udacity.asteroidradar.api.getDefaultStartDateFormatted
 import com.udacity.asteroidradar.database.getDatabase
 import com.udacity.asteroidradar.domain.Asteroid
@@ -10,12 +11,16 @@ import com.udacity.asteroidradar.repository.NasaRepository
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
+// Enum used to display progress bar information when loading asteroids from the network
+enum class AsteroidApiStatus { LOADING, ERROR, DONE }
+
+// Enum used to filter date ranges for asteroid database lookups from the main view
+enum class AsteroidFilter { SHOW_WEEK, SHOW_TODAY, SHOW_ALL }
+
 /**
  * [ViewModel] designed to store and manage UI-related data in a lifecycle conscious way. Used in
  * [com.udacity.asteroidradar.MainActivity].
  */
-enum class AsteroidApiStatus { LOADING, ERROR, DONE }
-
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     // The asteroid database and NASA repository
@@ -27,16 +32,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val pictureOfDay: LiveData<PictureOfDay>
         get() = _pictureOfDay
 
-    // Live Data to hold the Asteroids to display to the user
-    private val _asteroids = MutableLiveData<List<Asteroid>>()
-    val asteroids: LiveData<List<Asteroid>>
-        get() = _asteroids
-
     // Live Data to hold whether the user is/has navigated to the details screen
     private val _navigateToSelectedAsteroid = MutableLiveData<Asteroid>()
     val navigateToSelectedAsteroid: LiveData<Asteroid>
         get() = _navigateToSelectedAsteroid
-
 
     // The internal MutableLiveData that stores the status of the most recent asteroid request
     private val _status = MutableLiveData<AsteroidApiStatus>()
@@ -46,8 +45,21 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     init {
 
         // Retrieve the latest picture of the day and asteroids
-        getNasaPictureOfTheDay()
         getAsteroids()
+        getNasaPictureOfTheDay()
+    }
+
+    //var asteroids = nasaRepository.getAsteroidsForToday()
+    private val _asteroidFilter = MutableLiveData(AsteroidFilter.SHOW_WEEK)
+    private val asteroidFilter: LiveData<AsteroidFilter>
+        get() = _asteroidFilter
+
+    val asteroids = Transformations.switchMap(asteroidFilter) {
+        when (it!!) {
+            AsteroidFilter.SHOW_TODAY -> nasaRepository.getAsteroidsForToday()
+            AsteroidFilter.SHOW_WEEK -> nasaRepository.getAsteroidsForWeek()
+            AsteroidFilter.SHOW_ALL -> nasaRepository.getAllAsteroids()
+        }
     }
 
     /**
@@ -75,26 +87,38 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private fun getAsteroids() {
         viewModelScope.launch {
             try {
-
                 _status.value = AsteroidApiStatus.LOADING
-                val asteroids = nasaRepository.refreshAsteroids(getDefaultStartDateFormatted(), getDefaultStartDateFormatted())
-                _asteroids.value = asteroids
+                nasaRepository.refreshAsteroids(
+                    getDefaultStartDateFormatted(),
+                    getDefaultEndDateFormatted()
+                )
                 _status.value = AsteroidApiStatus.DONE
-                Timber.e("Asteroids: %s", asteroids.size)
             } catch (e: Exception) {
-                Timber.e(e, "Could not retrieve the NASA NEO...")
+                Timber.e(e, "Could not retrieve the NASA NEO (asteroids)...")
                 _status.value = AsteroidApiStatus.ERROR
-                _asteroids.value = ArrayList()
             }
         }
     }
 
+    /**
+     * Sets the Asteroid to pass to the detail screen.
+     */
     fun navigateToSelectedAsteroid(asteroid: Asteroid) {
         _navigateToSelectedAsteroid.value = asteroid
     }
 
+    /**
+     * Clears the selected asteroid.
+     */
     fun navigateToSelectedAsteroidCompleted() {
         _navigateToSelectedAsteroid.value = null
+    }
+
+    /**
+     * Filters used to retrieve asteroids.
+     */
+    fun updateFilter(filter: AsteroidFilter) {
+        _asteroidFilter.value = filter
     }
 
     /**
