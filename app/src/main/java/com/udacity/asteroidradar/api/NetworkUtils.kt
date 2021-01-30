@@ -2,6 +2,7 @@ package com.udacity.asteroidradar.api
 
 import com.udacity.asteroidradar.Constants
 import com.udacity.asteroidradar.network.domain.NetworkAsteroid
+import com.udacity.asteroidradar.network.domain.NetworkAsteroidList
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
@@ -10,7 +11,7 @@ import kotlin.collections.ArrayList
 /**
  * Utility function to parse the NASA NEO response into our [NetworkAsteroid] network model.
  */
-fun parseAsteroidsJsonResult(jsonResult: JSONObject): ArrayList<NetworkAsteroid> {
+fun parseAsteroidsJsonResult(jsonResult: JSONObject): NetworkAsteroidList {
 
     val nearEarthObjectsJson = jsonResult.getJSONObject("near_earth_objects")
     val asteroidList = ArrayList<NetworkAsteroid>()
@@ -47,7 +48,7 @@ fun parseAsteroidsJsonResult(jsonResult: JSONObject): ArrayList<NetworkAsteroid>
         }
     }
 
-    return asteroidList
+    return NetworkAsteroidList(asteroidList)
 }
 
 fun getNextSevenDaysFormattedDates(): ArrayList<String> {

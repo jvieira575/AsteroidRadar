@@ -4,16 +4,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.udacity.asteroidradar.BuildConfig
-import com.udacity.asteroidradar.api.getDefaultEndDateFormatted
 import com.udacity.asteroidradar.api.getDefaultStartDateFormatted
-import com.udacity.asteroidradar.api.parseAsteroidsJsonResult
 import com.udacity.asteroidradar.domain.Asteroid
 import com.udacity.asteroidradar.domain.PictureOfDay
-import com.udacity.asteroidradar.network.NasaApi
 import com.udacity.asteroidradar.repository.NasaRepository
 import kotlinx.coroutines.launch
-import org.json.JSONObject
 import timber.log.Timber
 
 /**
@@ -82,29 +77,10 @@ class MainViewModel : ViewModel() {
             try {
 
                 _status.value = AsteroidApiStatus.LOADING
-
-                val result = NasaApi.nasaApiService.getAsteroids(
-                    BuildConfig.API_KEY,
-                    getDefaultStartDateFormatted(),
-                    getDefaultEndDateFormatted()
-                )
-                val asteroids = parseAsteroidsJsonResult(JSONObject(result))
-                val domainAsteroids = asteroids.map {
-                    Asteroid(
-                        id = it.id,
-                        codename = it.codename,
-                        closeApproachDate = it.closeApproachDate,
-                        absoluteMagnitude = it.absoluteMagnitude,
-                        estimatedDiameter = it.estimatedDiameter,
-                        relativeVelocity = it.relativeVelocity,
-                        distanceFromEarth = it.distanceFromEarth,
-                        isPotentiallyHazardous = it.isPotentiallyHazardous
-                    )
-                }
-                _asteroids.value = domainAsteroids
-                _status.value = AsteroidApiStatus.ERROR
+                val asteroids = nasaRepository.refreshAsteroids(getDefaultStartDateFormatted(), getDefaultStartDateFormatted())
+                _asteroids.value = asteroids
+                _status.value = AsteroidApiStatus.DONE
                 Timber.e("Asteroids: %s", asteroids.size)
-
             } catch (e: Exception) {
                 Timber.e(e, "Could not retrieve the NASA NEO...")
                 _status.value = AsteroidApiStatus.ERROR
