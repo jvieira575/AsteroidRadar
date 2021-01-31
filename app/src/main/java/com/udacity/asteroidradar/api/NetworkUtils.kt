@@ -51,6 +51,10 @@ fun parseAsteroidsJsonResult(jsonResult: JSONObject): NetworkAsteroidList {
     return NetworkAsteroidList(asteroidList)
 }
 
+/**
+ * Function that returns a formatted list of dates. Currently set to return today's date until
+ * the default end date days.
+ */
 fun getNextSevenDaysFormattedDates(): ArrayList<String> {
     val formattedDateList = ArrayList<String>()
 
@@ -65,12 +69,18 @@ fun getNextSevenDaysFormattedDates(): ArrayList<String> {
     return formattedDateList
 }
 
+/**
+ * Function that returns a formatted default start date. Currently set to today's date.
+ */
 fun getDefaultStartDateFormatted(): String {
     val calendar = Calendar.getInstance()
     val dateFormat = SimpleDateFormat(Constants.API_QUERY_DATE_FORMAT, Locale.getDefault())
     return dateFormat.format(calendar.time)
 }
 
+/**
+ * Function that returns a formatted default end date. Currently set to seven days from today's date..
+ */
 fun getDefaultEndDateFormatted(): String {
     val calendar = Calendar.getInstance()
     calendar.add(Calendar.DAY_OF_YEAR, Constants.DEFAULT_END_DATE_DAYS)
